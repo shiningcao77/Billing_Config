@@ -59,6 +59,13 @@ function downloadFile(name,text,type='text/csv;charset=utf-8'){const blob=new Bl
 function csv(rows){return rows.map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\r\n')}
 function downloadCosts(){const rows=filteredUsage();downloadFile('billing-costs.csv',csv([['Project','Service','SKU','Quantity','Unit','Cost (USD)'],...rows.map(r=>[r.project,r.service,r.sku,r.quantity,r.unit,r.cost.toFixed(2)])]))}
 function executeConsoleAction(name,t){
+ if(name==='preview-owners'){
+ const rule=draft.rules.find(r=>Number(r.percent)===90)||draft.rules[0]||{percent:90,trigger:'Actual'};
+ const percent=Number(rule.percent),budgetAmount=amount(),budgetName=draft.name||draft.projects[0]||'Atlas';
+ dialog('Email alert preview',`<article class="email-alert-preview"><div class="email-meta"><div><strong>From:</strong> Cloud Billing</div><div><strong>Subject:</strong> Budget alert: ${esc(percent)}% threshold reached</div></div><h3>Budget alert</h3><p>Your budget ${esc(budgetName)} has ${rule.trigger==='Forecasted'?'been forecast to reach':'reached'} <strong>${esc(percent)}%</strong> of its configured amount.</p><div class="email-totals"><div><strong>Budget:</strong> ${money(budgetAmount)}</div><div><strong>${rule.trigger==='Forecasted'?'Forecasted':'Current'} spending:</strong> ${money(budgetAmount*percent/100)}</div></div><button class="email-report" data-action="preview-owner-report"><span aria-hidden="true">→</span> View report</button></article>`);
+ $('#overlay .modal').classList.add('email-preview-modal');return
+ }
+ if(name==='preview-owner-report'){dismiss();go('reports');return}
  if(name==='dismiss'){dismiss();return}
  if(name==='collapse-nav'){document.body.classList.toggle('navclosed');return}
  if(name==='search'){consoleSearch=$('.search input').value.trim();go('search');return}

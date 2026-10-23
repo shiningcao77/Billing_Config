@@ -64,6 +64,7 @@ function downloadFile(name,text,type='text/csv;charset=utf-8'){const blob=new Bl
 function csv(rows){return rows.map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\r\n')}
 function downloadCosts(){const rows=filteredUsage();downloadFile('billing-costs.csv',csv([['Project','Service','SKU','Quantity','Unit','Cost (USD)'],...rows.map(r=>[r.project,r.service,r.sku,r.quantity,r.unit,r.cost.toFixed(2)])]))}
 function executeConsoleAction(name,t){
+ if(typeof handleCloudAction==='function'&&handleCloudAction(name,t))return;
  if(name==='home-project'){dialog('Select a project','<p class="page-note">Recent projects</p><button class="account-option" data-action="dismiss"><strong>Atlas</strong><small>atlas-research · Research Group</small><span class="status">Selected</span></button>');return}
  if(name==='home-project-info'){dialog('Project info','<p><strong>Project name:</strong> Atlas</p><p><strong>Project number:</strong> 233984005590</p><p><strong>Project ID:</strong> atlas-research</p>',action('dismiss','CLOSE'));return}
  if(name==='home-quick-info'){dialog('Quick access','<p>Quick access brings your frequently used Google Cloud products together.</p><p>Select Billing to manage the Research Group billing account.</p>',action('dismiss','GOT IT'));return}
